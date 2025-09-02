@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: twitter-clone-nestjs-mysql
+    restart: always
+    ports:
+      - '3306:3306'
+    env_file:
+      - docker.env
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
