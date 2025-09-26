@@ -24,6 +24,7 @@
     "migration:revert": "yarn typeorm migration:revert -d ./data-source.ts"
   },
   "dependencies": {
+    "@nestjs-modules/ioredis": "^2.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -31,6 +32,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
     "bcrypt": "^6.0.0",
+    "ioredis": "^5.8.0",
     "joi": "^18.0.1",
     "mysql2": "^3.14.4",
     "reflect-metadata": "^0.2.2",

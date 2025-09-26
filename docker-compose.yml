@@ -10,5 +10,12 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
+  redis:
+    image: redis:7
+    container_name: twitter-clone-nestjs-redis
+    restart: always
+    ports:
+      - '6379:6379'
+
 volumes:
   db_data:

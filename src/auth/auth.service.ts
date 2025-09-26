@@ -4,12 +4,15 @@ import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { LogInUserDto } from 'src/users/dto/log-in-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class AuthService {
     constructor (
         private usersService: UsersService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        @InjectRedis() private readonly redis: Redis
     ){}
 
     async logIn (payload: LogInUserDto){
@@ -30,6 +33,8 @@ export class AuthService {
         const accessToken = this.jwtService.sign(jwtPayload, { expiresIn: '15m' });
         const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
 
+        this.storeRefreshToken(user.id, refreshToken);
+
         return {
             access_token: accessToken,
             refresh_token: refreshToken
@@ -45,5 +50,14 @@ export class AuthService {
             ...payload,
             password: passwordHash
         });
+    }
+
+    async storeRefreshToken (userId: number, token: string){
+        await this.redis.set(
+            `refresh_token:${userId}`,
+            token,
+            'EX',
+            60 * 60 * 24 * 7
+        );
     }
 }
