@@ -22,8 +22,9 @@ export class AuthController {
 
     @UseGuards(AuthGuard)
     @Get('token')
-    refreshToken (@Request() req){
+    async refreshToken (@Request() req){
         const payload = req.user;
-        return this.authService.generateTokens({ sub: payload.sub, email: payload.email });
+        const token = req.token;
+        return await this.authService.refreshToken(payload, token);
     }
 }

@@ -44,7 +44,22 @@ export class AuthService {
         });
     }
 
-    generateTokens(jwtPayload: { sub: number, email: string }){
+    async refreshToken (payload: any, token: string){
+        const storedToken = await this.redis.get(`refresh_token:${payload.sub}`);
+
+        if (!storedToken){
+            throw new UnauthorizedException();
+        }
+
+        if (storedToken !== token){
+            throw new UnauthorizedException();
+        }
+
+        const jwtPayload = { sub: payload.sub, email: payload.email };
+        return this.generateTokens(jwtPayload);
+    }
+
+    private generateTokens(jwtPayload: { sub: number, email: string }){
         const accessToken = this.jwtService.sign(jwtPayload, { expiresIn: '15m' });
         const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
 
