@@ -30,15 +30,7 @@ export class AuthService {
 
         const jwtPayload = { sub: user.id, email: user.email };
 
-        const accessToken = this.jwtService.sign(jwtPayload, { expiresIn: '15m' });
-        const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
-
-        this.storeRefreshToken(user.id, refreshToken);
-
-        return {
-            access_token: accessToken,
-            refresh_token: refreshToken
-        }
+        return this.generateTokens(jwtPayload);
     }
 
     async signUp (payload: CreateUserDto){
@@ -52,7 +44,19 @@ export class AuthService {
         });
     }
 
-    async storeRefreshToken (userId: number, token: string){
+    generateTokens(jwtPayload: { sub: number, email: string }){
+        const accessToken = this.jwtService.sign(jwtPayload, { expiresIn: '15m' });
+        const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
+
+        this.storeRefreshToken(jwtPayload.sub, refreshToken);
+
+        return {
+            access_token: accessToken,
+            refresh_token: refreshToken
+        }
+    }
+
+    private async storeRefreshToken (userId: number, token: string){
         await this.redis.set(
             `refresh_token:${userId}`,
             token,
