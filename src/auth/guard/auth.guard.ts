@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as dotenv from 'dotenv';
-import { BaseAuthGuard } from "./guard/base.guard";
+import { BaseAuthGuard } from "./base.guard";
 
 dotenv.config();
 

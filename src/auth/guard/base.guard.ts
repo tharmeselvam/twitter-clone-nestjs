@@ -25,7 +25,7 @@ export class BaseAuthGuard implements CanActivate {
                 issuer: 'twitter-clone-nestjs'
             });
 
-            request['user'] = payload;
+            request['payload'] = payload;
             request['token'] = token;
         } catch {
             throw new UnauthorizedException;

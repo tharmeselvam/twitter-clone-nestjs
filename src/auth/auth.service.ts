@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -19,7 +19,7 @@ export class AuthService {
         const user = await this.usersService.findByEmail(payload.email);
         
         if (!user) {
-            throw UnauthorizedException;
+            throw NotFoundException;
         }
 
         const isMatch = bcrypt.compare(payload.password, user.password);
@@ -29,7 +29,6 @@ export class AuthService {
         }
 
         const jwtPayload = { sub: user.id, email: user.email };
-
         return this.generateTokens(jwtPayload);
     }
 
@@ -47,11 +46,7 @@ export class AuthService {
     async refreshToken (payload: any, token: string){
         const storedToken = await this.redis.get(`refresh_token:${payload.sub}`);
 
-        if (!storedToken){
-            throw new UnauthorizedException();
-        }
-
-        if (storedToken !== token){
+        if (!storedToken || storedToken !== token){
             throw new UnauthorizedException();
         }
 
@@ -60,14 +55,13 @@ export class AuthService {
     }
 
     async logOut (payload: any){
-        const userId = payload.sub;
-        const storedToken = await this.redis.get(`refresh_token:${userId}`);
+        const storedToken = await this.redis.get(`refresh_token:${payload.sub}`);
 
         if (!storedToken){
             throw new UnauthorizedException;
         }
 
-        await this.redis.del(`refresh_token:${userId}`);
+        await this.redis.del(`refresh_token:${payload.sub}`);
     }
 
     private generateTokens(jwtPayload: { sub: number, email: string }){

@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Post, Request, UseGuards } from '@nestjs
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LogInUserDto } from 'src/users/dto/log-in-user.dto';
-import { AuthGuard, RefreshAuthGuard } from './auth.guard';
+import { AuthGuard, RefreshAuthGuard } from './guard/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,16 +22,16 @@ export class AuthController {
 
     @UseGuards(AuthGuard)
     @Delete('log-out')
-    async logOut (@Request() req){
-        const payload = req.user;
+    async logOut (@Request() request){
+        const payload = request.payload;
         return await this.authService.logOut(payload);
     }
 
     @UseGuards(RefreshAuthGuard)
-    @Get('token')
-    async refreshToken (@Request() req){
-        const payload = req.user;
-        const token = req.token;
+    @Get('tokens')
+    async refreshToken (@Request() request){
+        const payload = request.payload;
+        const token = request.token;
         return await this.authService.refreshToken(payload, token);
     }
 }
