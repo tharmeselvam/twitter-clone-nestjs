@@ -66,8 +66,16 @@ export class AuthService {
     }
 
     private generateTokens(jwtPayload: { sub: number, email: string }){
-        const accessToken = this.jwtService.sign(jwtPayload, { expiresIn: '15m' });
-        const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
+        const accessToken = this.jwtService.sign(jwtPayload, {
+            expiresIn: '15m',
+            audience: 'api',
+            issuer: 'twitter-clone-nestjs'
+        });
+        const refreshToken = this.jwtService.sign(jwtPayload, {
+            expiresIn: '7d',
+            audience: 'auth',
+            issuer: 'twitter-clone-nestjs'
+        });
 
         this.storeRefreshToken(jwtPayload.sub, refreshToken);
 
