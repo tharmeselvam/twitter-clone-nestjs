@@ -61,8 +61,13 @@ export class AuthService {
 
     async logOut (payload: any){
         const userId = payload.sub;
-        const result = await this.redis.del(`refresh_token:${userId}`);
-        console.log(result);
+        const storedToken = await this.redis.get(`refresh_token:${userId}`);
+
+        if (!storedToken){
+            throw new UnauthorizedException;
+        }
+
+        await this.redis.del(`refresh_token:${userId}`);
     }
 
     private generateTokens(jwtPayload: { sub: number, email: string }){

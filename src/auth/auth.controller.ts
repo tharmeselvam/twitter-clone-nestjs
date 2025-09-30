@@ -24,7 +24,7 @@ export class AuthController {
     @Delete('log-out')
     async logOut (@Request() req){
         const payload = req.user;
-        await this.authService.logOut(payload);
+        return await this.authService.logOut(payload);
     }
 
     @UseGuards(RefreshAuthGuard)
