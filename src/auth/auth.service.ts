@@ -59,6 +59,12 @@ export class AuthService {
         return this.generateTokens(jwtPayload);
     }
 
+    async logOut (payload: any){
+        const userId = payload.sub;
+        const result = await this.redis.del(`refresh_token:${userId}`);
+        console.log(result);
+    }
+
     private generateTokens(jwtPayload: { sub: number, email: string }){
         const accessToken = this.jwtService.sign(jwtPayload, { expiresIn: '15m' });
         const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
