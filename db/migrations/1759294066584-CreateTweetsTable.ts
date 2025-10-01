@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateTweetTable1759221929365 implements MigrationInterface {
-    name = 'CreateTweetTable1759221929365'
+export class CreateTweetsTable1759294066584 implements MigrationInterface {
+    name = 'CreateTweetsTable1759294066584'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`tweets\` (\`id\` int NOT NULL AUTO_INCREMENT, \`content\` varchar(280) NOT NULL, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`userId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);

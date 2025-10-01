@@ -1,5 +1,4 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, TableForeignKey } from "typeorm";
-import { ForeignKey } from "typeorm/browser";
 import { User } from "./user.entity";
 
 @Entity('tweets')
