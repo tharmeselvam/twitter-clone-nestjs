@@ -19,4 +19,11 @@ export class TweetsService {
 
         return await this.tweetsRepository.save(tweet);
     }
+
+    async findTweetsByUserId (userId: number): Promise<Tweet[]> {
+        return await this.tweetsRepository.find({
+            where: { user: { id: userId }},
+            order: { createdAt: 'DESC' }
+        });
+    }
 }
