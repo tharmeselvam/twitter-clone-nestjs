@@ -31,7 +31,7 @@ export class TweetsController {
     }
 
     @Get('user/:id')
-    async getUserTweets (@Param('id') id: string){
-        return this.tweetsService.findTweetsByUserId(Number(id));
+    async getUserTweets (@Param('id', ParseIntPipe) userId: number){
+        return this.tweetsService.findTweetsByUserId(userId);
     }
 }
