@@ -9,6 +9,7 @@ import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { TweetsModule } from './tweets/tweets.module';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TweetsModule } from './tweets/tweets.module';
     UsersModule,
     AuthModule,
     TweetsModule,
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

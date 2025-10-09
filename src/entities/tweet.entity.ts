@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, TableForeignKey } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, TableForeignKey } from "typeorm";
 import { User } from "./user.entity";
+import { Like } from "./like.entity";
 
 @Entity('tweets')
 export class Tweet {
@@ -9,8 +10,11 @@ export class Tweet {
     @ManyToOne(() => User, (user) => user.tweets, { onDelete: 'CASCADE' })
     user: User;
 
-    @Column({ length: 280})
+    @Column({ length: 280 })
     content: string;
+
+    @OneToMany(() => Like, (like) => like.tweet)
+    likes: Like[];
 
     @CreateDateColumn()
     createdAt: Date;
