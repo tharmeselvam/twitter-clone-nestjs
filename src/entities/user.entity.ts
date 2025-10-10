@@ -1,4 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Tweet } from "./tweet.entity";
+import { Like } from "./like.entity";
 
 @Entity('users')
 export class User {
@@ -13,6 +15,12 @@ export class User {
 
     @Column()
     password: string
+
+    @OneToMany(() => Tweet, (tweet) => tweet.user)
+    tweets: Tweet[];
+
+    @OneToMany(() => Like, (like) => (like.user))
+    likes: Like[];
 
     @Column({ default: true })
     isActive: boolean;
