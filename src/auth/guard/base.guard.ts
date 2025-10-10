@@ -19,13 +19,13 @@ export class BaseAuthGuard implements CanActivate {
         }
 
         try {
-            const payload = await this.jwtService.verifyAsync(token, {
+            const user = await this.jwtService.verifyAsync(token, {
                 secret: process.env.JWT_SECRET,
                 audience: this.expectedAud,
                 issuer: 'twitter-clone-nestjs'
             });
 
-            request['payload'] = payload;
+            request['user'] = user;
             request['token'] = token;
         } catch {
             throw new UnauthorizedException;
