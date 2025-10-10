@@ -2,7 +2,6 @@ import { Request, Body, Controller, Post, Get, UseGuards, Param, ParseIntPipe } 
 import { TweetsService } from './tweets.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { LikeTweetDto } from 'src/likes/dto/like-tweet.dto';
 
 @Controller('tweets')
 export class TweetsController {
@@ -13,14 +12,14 @@ export class TweetsController {
     @UseGuards(AuthGuard)
     @Post('create')
     async createTweet (@Body() payload: CreateTweetDto, @Request() request){
-        const userId = request.payload.sub;
+        const userId = request.user.sub;
         return await this.tweetsService.createTweet(payload, userId);
     }
 
     @UseGuards(AuthGuard)
     @Post(':id/like')
     async toggleLikeTweet (@Param('id', ParseIntPipe) tweetId: number, @Request() request){
-        const userId = request.payload.sub;
+        const userId = request.user.sub;
         return await this.tweetsService.toggleLikeTweet(tweetId, userId);
     }
 
@@ -30,7 +29,7 @@ export class TweetsController {
         @Param('id', ParseIntPipe) parentTweetId: number,
         @Body() payload: CreateTweetDto,
         @Request() request){
-            const userId = request.payload.sub;
+            const userId = request.user.sub;
             return await this.tweetsService.createTweet(payload, userId, parentTweetId);
     }
 
@@ -42,7 +41,7 @@ export class TweetsController {
     @UseGuards(AuthGuard)
     @Get('me')
     async getMyTweets (@Request() request){
-        return this.tweetsService.findTweetsByUserId(request.payload.sub);
+        return this.tweetsService.findTweetsByUserId(request.user.sub);
     }
 
     @Get('user/:id')
