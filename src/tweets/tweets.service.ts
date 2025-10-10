@@ -14,9 +14,10 @@ export class TweetsService {
         private tweetsRepository: Repository<Tweet>
     ){}
 
-    async createTweet (payload: CreateTweetDto, userId: number, ){
+    async createTweet (payload: CreateTweetDto, userId: number, parentTweetId?: number){
         const tweet =  await this.tweetsRepository.create({
             content: payload.content,
+            parentTweet: parentTweetId ? { id: parentTweetId } : undefined,
             user: { id: userId }
         });
 
@@ -25,6 +26,13 @@ export class TweetsService {
 
     async toggleLikeTweet (tweetId: number, userId: number){
         this.likesService.toggleLikeTweet(tweetId, userId);
+    }
+
+    async getTweetReplies (tweetId: number): Promise<Tweet[]> {
+        return await this.tweetsRepository.find({
+            where: { parentTweet: { id: tweetId }},
+            order: { createdAt: 'DESC' }
+        });
     }
 
     async findTweetsByUserId (userId: number): Promise<Tweet[]> {

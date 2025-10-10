@@ -25,6 +25,21 @@ export class TweetsController {
     }
 
     @UseGuards(AuthGuard)
+    @Post(':id/reply')
+    async replyToTweet (
+        @Param('id', ParseIntPipe) parentTweetId: number,
+        @Body() payload: CreateTweetDto,
+        @Request() request){
+            const userId = request.payload.sub;
+            return await this.tweetsService.createTweet(payload, userId, parentTweetId);
+    }
+
+    @Get(':id/replies')
+    async getTweetReplies (@Param('id', ParseIntPipe) tweetId: number){
+        return await this.tweetsService.getTweetReplies(tweetId);
+    }
+
+    @UseGuards(AuthGuard)
     @Get('me')
     async getMyTweets (@Request() request){
         return this.tweetsService.findTweetsByUserId(request.payload.sub);

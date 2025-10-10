@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, TableForeignKey } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 import { Like } from "./like.entity";
 
@@ -15,6 +15,12 @@ export class Tweet {
 
     @OneToMany(() => Like, (like) => like.tweet)
     likes: Like[];
+
+    @ManyToOne(() => Tweet, (tweet) => tweet.replies, { nullable: true, onDelete: 'CASCADE' })
+    parentTweet: Tweet;
+
+    @OneToMany(() => Tweet, (tweet) => tweet.parentTweet)
+    replies: Tweet[];
 
     @CreateDateColumn()
     createdAt: Date;
