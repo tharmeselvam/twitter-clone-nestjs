@@ -4,12 +4,14 @@ import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LogInUserDto } from './dto/log-in-user.dto';
+import { UserProfilesService } from 'src/user-profiles/user-profiles.service';
 
 @Injectable()
 export class UsersService {
     constructor (
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private userProfilesService: UserProfilesService
     ){}
 
     async findByEmail (email: string): Promise<User | null> {
@@ -18,7 +20,10 @@ export class UsersService {
 
     async createUser (payload: CreateUserDto): Promise<User> {
         const user = this.usersRepository.create(payload);
+        const savedUser = await this.usersRepository.save(user);
 
-        return await this.usersRepository.save(user);
+        await this.userProfilesService.createUserProfile(savedUser.id, payload.name);
+        
+        return savedUser;
     }
 }
