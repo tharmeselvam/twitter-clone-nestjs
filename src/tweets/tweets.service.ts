@@ -4,7 +4,6 @@ import { Tweet } from 'src/entities/tweet.entity';
 import { Repository } from 'typeorm';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { LikesService } from 'src/likes/likes.service';
-import { LikeTweetDto } from 'src/likes/dto/like-tweet.dto';
 
 @Injectable()
 export class TweetsService {

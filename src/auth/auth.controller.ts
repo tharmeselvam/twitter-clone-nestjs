@@ -23,15 +23,15 @@ export class AuthController {
     @UseGuards(AuthGuard)
     @Delete('log-out')
     async logOut (@Request() request){
-        const payload = request.payload;
-        return await this.authService.logOut(payload);
+        const userId = request.user.sub;
+        return await this.authService.logOut(userId);
     }
 
     @UseGuards(RefreshAuthGuard)
     @Get('tokens')
     async refreshToken (@Request() request){
-        const payload = request.payload;
+        const user = request.user;
         const token = request.token;
-        return await this.authService.refreshToken(payload, token);
+        return await this.authService.refreshToken(user, token);
     }
 }

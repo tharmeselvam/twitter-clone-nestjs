@@ -43,25 +43,25 @@ export class AuthService {
         });
     }
 
-    async refreshToken (payload: any, token: string){
-        const storedToken = await this.redis.get(`refresh_token:${payload.sub}`);
+    async refreshToken (user: any, token: string){
+        const storedToken = await this.redis.get(`refresh_token:${user.sub}`);
 
         if (!storedToken || storedToken !== token){
             throw new UnauthorizedException();
         }
 
-        const jwtPayload = { sub: payload.sub, email: payload.email };
+        const jwtPayload = { sub: user.sub, email: user.email };
         return this.generateTokens(jwtPayload);
     }
 
-    async logOut (payload: any){
-        const storedToken = await this.redis.get(`refresh_token:${payload.sub}`);
+    async logOut (userId: number){
+        const storedToken = await this.redis.get(`refresh_token:${userId}`);
 
         if (!storedToken){
             throw new UnauthorizedException;
         }
 
-        await this.redis.del(`refresh_token:${payload.sub}`);
+        await this.redis.del(`refresh_token:${userId}`);
     }
 
     private generateTokens(jwtPayload: { sub: number, email: string }){
