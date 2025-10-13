@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGenerated
 import { Tweet } from "./tweet.entity";
 import { Like } from "./like.entity";
 import { UserProfile } from "./user-profile.entity";
+import { Follow } from "./follow.entity";
 
 @Entity('users')
 export class User {
@@ -22,6 +23,12 @@ export class User {
 
     @OneToMany(() => Like, (like) => (like.user))
     likes: Like[];
+
+    @OneToMany(() => Follow, (follow) => follow.follower)
+    following: Follow[];
+
+    @OneToMany(() => Follow, (follow) => follow.following)
+    follower: Follow[];
 
     @OneToOne(() => UserProfile, (profile) => profile.user)
     profile: UserProfile
