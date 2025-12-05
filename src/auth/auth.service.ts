@@ -19,13 +19,13 @@ export class AuthService {
         const user = await this.usersService.findByEmail(payload.email);
         
         if (!user) {
-            throw NotFoundException;
+            throw new NotFoundException("Email address not found.");
         }
 
-        const isMatch = bcrypt.compare(payload.password, user.password);
+        const isMatch = await bcrypt.compare(payload.password, user.password);
 
         if (!isMatch) {
-            throw UnauthorizedException;
+            throw new UnauthorizedException("Incorrect password.");
         }
 
         const jwtPayload = { sub: user.id, email: user.email };
