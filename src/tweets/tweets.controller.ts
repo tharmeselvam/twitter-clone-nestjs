@@ -39,6 +39,12 @@ export class TweetsController {
     }
 
     @UseGuards(AuthGuard)
+    @Get('following')
+    async getFollowingTweets (@Request() request){
+        return this.tweetsService.getFollowingTweets(request.user.sub);
+    }
+
+    @UseGuards(AuthGuard)
     @Get('me')
     async getMyTweets (@Request() request){
         return this.tweetsService.findTweetsByUserId(request.user.sub);

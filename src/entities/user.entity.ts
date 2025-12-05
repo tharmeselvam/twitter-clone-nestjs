@@ -28,7 +28,7 @@ export class User {
     following: Follow[];
 
     @OneToMany(() => Follow, (follow) => follow.following)
-    follower: Follow[];
+    followers: Follow[];
 
     @OneToOne(() => UserProfile, (profile) => profile.user)
     profile: UserProfile

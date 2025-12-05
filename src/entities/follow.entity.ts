@@ -10,7 +10,7 @@ export class Follow {
     @ManyToOne(() => User, (user) => user.following)
     follower: User;
 
-    @ManyToOne(() => User, (user) => user.follower)
+    @ManyToOne(() => User, (user) => user.followers)
     following: User;
 
     @CreateDateColumn()

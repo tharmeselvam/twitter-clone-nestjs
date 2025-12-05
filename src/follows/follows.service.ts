@@ -26,4 +26,24 @@ export class FollowsService {
             return await this.followsRepository.save(followUser);
         }
     }
+
+    async getFollowedUserIds (userId: number): Promise<number[]> {
+        const followedUsers = await this.followsRepository.find({
+            where: { follower: {id: userId } },
+            relations: ['following'],
+            order: { createdAt: 'DESC' }
+        });
+
+        return followedUsers.map(f => f.following.id);
+    }
+
+    async getFollowerIds (userId: number): Promise<number[]> {
+        const followers = await this.followsRepository.find({
+            where: { following: { id: userId } },
+            relations: ['follower'],
+            order: { createdAt: 'DESC' }
+        });
+
+        return followers.map(f => f.follower.id);
+    }
 }
