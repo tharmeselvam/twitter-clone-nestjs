@@ -79,8 +79,8 @@ export class AuthService {
         this.storeRefreshToken(jwtPayload.sub, refreshToken);
 
         return {
-            access_token: accessToken,
-            refresh_token: refreshToken
+            accessToken: accessToken,
+            refreshToken: refreshToken
         }
     }
 

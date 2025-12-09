@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tweet } from 'src/entities/tweet.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { LikesService } from 'src/likes/likes.service';
+import { FollowsService } from 'src/follows/follows.service';
 
 @Injectable()
 export class TweetsService {
     constructor (
         private likesService: LikesService,
+        private followsService: FollowsService,
         @InjectRepository(Tweet)
         private tweetsRepository: Repository<Tweet>
     ){}
@@ -30,6 +32,15 @@ export class TweetsService {
     async getTweetReplies (tweetId: number): Promise<Tweet[]> {
         return await this.tweetsRepository.find({
             where: { parentTweet: { id: tweetId }},
+            order: { createdAt: 'DESC' }
+        });
+    }
+
+    async getFollowingTweets (userId: number): Promise<Tweet[]> {
+        const followedUserIds = await this.followsService.getFollowedUserIds(userId);
+
+        return this.tweetsRepository.find({
+            where: { user: { id: In(followedUserIds) } },
             order: { createdAt: 'DESC' }
         });
     }
