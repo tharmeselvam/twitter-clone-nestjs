@@ -38,6 +38,8 @@ export class UsersService {
 
         const [data, total] = await this.usersRepository
             .createQueryBuilder('u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .select(['u.id', 'u.username', 'p.name', 'p.bio'])
             .where('LOWER(u.username) LIKE LOWER(:query)', {query})
             .take(limit)
             .skip((page - 1)*limit)
