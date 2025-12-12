@@ -13,6 +13,7 @@ import { FollowsModule } from 'src/follows/follows.module';
         FollowsModule
     ],
     providers: [TweetsService],
-    controllers: [TweetsController]
+    controllers: [TweetsController],
+    exports: [TweetsService]
 })
 export class TweetsModule {}

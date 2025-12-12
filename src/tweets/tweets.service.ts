@@ -51,4 +51,17 @@ export class TweetsService {
             order: { createdAt: 'DESC' }
         });
     }
+
+    async searchTweets(search: string, page: number, limit = 20) {
+        const query = `%${search}%`;
+
+        const [data, total] = await this.tweetsRepository
+            .createQueryBuilder('t')
+            .where('LOWER(t.content) LIKE LOWER(:query)', {query})
+            .take(limit)
+            .skip((page - 1)*limit)
+            .getManyAndCount();
+
+        return { page, limit, total, data }
+    }
 }
