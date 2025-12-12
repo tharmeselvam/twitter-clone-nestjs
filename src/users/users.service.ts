@@ -16,11 +16,11 @@ export class UsersService {
         private followsService: FollowsService
     ){}
 
-    async findByEmail (email: string): Promise<User | null> {
+    async findByEmail(email: string): Promise<User | null> {
         return await this.usersRepository.findOneBy({email: email})
     }
 
-    async createUser (payload: CreateUserDto): Promise<User> {
+    async createUser(payload: CreateUserDto): Promise<User> {
         const user = this.usersRepository.create(payload);
         const savedUser = await this.usersRepository.save(user);
 
@@ -29,7 +29,22 @@ export class UsersService {
         return savedUser;
     }
 
-    async toggleFollow (followerUserId: number, followingUserId: number){
+    async toggleFollow(followerUserId: number, followingUserId: number){
         return await this.followsService.toggleFollow(followerUserId, followingUserId);
+    }
+
+    async searchUsers(search: string, page: number, limit = 20) {
+        const query = `%${search}%`;
+
+        const [data, total] = await this.usersRepository
+            .createQueryBuilder('u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .select(['u.id', 'u.username', 'p.name', 'p.bio'])
+            .where('LOWER(u.username) LIKE LOWER(:query)', {query})
+            .take(limit)
+            .skip((page - 1)*limit)
+            .getManyAndCount();
+
+        return { page, limit, total, data };
     }
 }
