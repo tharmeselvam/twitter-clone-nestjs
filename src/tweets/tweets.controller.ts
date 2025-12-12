@@ -43,8 +43,15 @@ export class TweetsController {
 
     @UseGuards(AuthGuard)
     @Get('following')
-    async getFollowingTweets (@Request() request){
-        return this.tweetsService.getFollowingTweets(request.user.sub);
+    async getFollowingTweets (
+        @Request() request,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
+    ): Promise<PaginatedResult<TweetResponseDto>>{
+        const { tweets, total } = await this.tweetsService.getFollowingTweets(request.user.sub, page, limit);
+        const data = tweets.map(tweetsMapper);
+        
+        return { page, limit, total, data };
     }
 
     @UseGuards(AuthGuard)

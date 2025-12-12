@@ -38,16 +38,24 @@ export class TweetsService {
         });
     }
 
-    async getFollowingTweets (userId: number): Promise<Tweet[]> {
+    async getFollowingTweets (userId: number, page: number, limit: number): Promise<{ tweets: Tweet[], total: number }> {
         const followedUserIds = await this.followsService.getFollowedUserIds(userId);
 
-        return this.tweetsRepository.find({
-            where: { user: { id: In(followedUserIds) } },
-            order: { createdAt: 'DESC' }
-        });
+        const [tweets, total] = await this.tweetsRepository
+            .createQueryBuilder('t')
+            .leftJoinAndSelect('t.user', 'u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .select(['t', 'u.id', 'u.username', 'p.name'])
+            .where('u.id IN (:...ids)', {ids: followedUserIds})
+            .orderBy('t.createdAt', 'DESC')
+            .take(limit)
+            .skip((page - 1) * limit)
+            .getManyAndCount();
+
+        return { tweets, total };
     }
 
-    async findTweetsByUserId(userId: number, page: number, limit = 20): Promise<{ tweets: Tweet[], total: number}> {
+    async findTweetsByUserId(userId: number, page: number, limit: number): Promise<{ tweets: Tweet[], total: number}> {
         const [tweets, total] = await this.tweetsRepository
             .createQueryBuilder('t')
             .leftJoinAndSelect('t.user', 'u')
