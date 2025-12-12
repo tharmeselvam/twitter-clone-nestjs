@@ -5,6 +5,8 @@ import { In, Repository } from 'typeorm';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { LikesService } from 'src/likes/likes.service';
 import { FollowsService } from 'src/follows/follows.service';
+import { PaginatedResult } from 'src/util/paginated-result.interface';
+import { TweetResponseDto } from './dto/tweet-response.dto';
 
 @Injectable()
 export class TweetsService {
@@ -26,7 +28,7 @@ export class TweetsService {
     }
 
     async toggleLikeTweet (tweetId: number, userId: number){
-        this.likesService.toggleLikeTweet(tweetId, userId);
+        return await this.likesService.toggleLikeTweet(tweetId, userId);
     }
 
     async getTweetReplies (tweetId: number): Promise<Tweet[]> {
@@ -45,11 +47,19 @@ export class TweetsService {
         });
     }
 
-    async findTweetsByUserId (userId: number): Promise<Tweet[]> {
-        return await this.tweetsRepository.find({
-            where: { user: { id: userId }},
-            order: { createdAt: 'DESC' }
-        });
+    async findTweetsByUserId(userId: number, page: number, limit = 20): Promise<{ tweets: Tweet[], total: number}> {
+        const [tweets, total] = await this.tweetsRepository
+            .createQueryBuilder('t')
+            .leftJoinAndSelect('t.user', 'u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .select(['t', 'u.id', 'u.username', 'p.name'])
+            .where('u.id = :id', {id: userId})
+            .orderBy('t.createdAt', 'DESC')
+            .take(limit)
+            .skip((page - 1) * limit)
+            .getManyAndCount();
+
+        return { tweets, total };
     }
 
     async searchTweets(search: string, page: number, limit = 20) {
