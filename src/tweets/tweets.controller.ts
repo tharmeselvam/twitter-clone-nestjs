@@ -37,13 +37,20 @@ export class TweetsController {
     }
 
     @Get(':id/replies')
-    async getTweetReplies (@Param('id', ParseIntPipe) tweetId: number){
-        return await this.tweetsService.getTweetReplies(tweetId);
+    async getTweetReplies(
+        @Param('id', ParseIntPipe) tweetId: number,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
+    ): Promise<PaginatedResult<TweetResponseDto>>{
+        const { tweets, total } = await this.tweetsService.getTweetReplies(tweetId, page, limit);
+        const data = tweets.map(tweetsMapper);
+
+        return { page, limit, total, data };
     }
 
     @UseGuards(AuthGuard)
     @Get('following')
-    async getFollowingTweets (
+    async getFollowingTweets(
         @Request() request,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number

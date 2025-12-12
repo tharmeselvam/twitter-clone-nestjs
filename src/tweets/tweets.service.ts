@@ -31,11 +31,19 @@ export class TweetsService {
         return await this.likesService.toggleLikeTweet(tweetId, userId);
     }
 
-    async getTweetReplies (tweetId: number): Promise<Tweet[]> {
-        return await this.tweetsRepository.find({
-            where: { parentTweet: { id: tweetId }},
-            order: { createdAt: 'DESC' }
-        });
+    async getTweetReplies (tweetId: number, page: number, limit: number): Promise<{ tweets, total }> {
+        const [tweets, total] = await this.tweetsRepository
+            .createQueryBuilder('t')
+            .leftJoinAndSelect('t.user', 'u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .select(['t', 'u.id', 'u.username', 'p.name'])
+            .where('t.parentTweet.id = :id', {id: tweetId})
+            .orderBy('t.createdAt', 'ASC')
+            .take(limit)
+            .skip((page - 1) * limit)
+            .getManyAndCount();
+
+        return { tweets, total };
     }
 
     async getFollowingTweets (userId: number, page: number, limit: number): Promise<{ tweets: Tweet[], total: number }> {
