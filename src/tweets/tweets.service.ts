@@ -79,10 +79,10 @@ export class TweetsService {
         return { tweets, total };
     }
 
-    async searchTweets(search: string, page: number, limit = 20) {
-        const query = `%${search}%`;
+    async searchTweets(key: string, page: number, limit: number): Promise<{ tweets, total }> {
+        const query = `%${key}%`;
 
-        const [data, total] = await this.tweetsRepository
+        const [tweets, total] = await this.tweetsRepository
             .createQueryBuilder('t')
             .leftJoinAndSelect('t.user', 'u')
             .leftJoinAndSelect('u.profile', 'p')
@@ -92,6 +92,6 @@ export class TweetsService {
             .skip((page - 1)*limit)
             .getManyAndCount();
 
-        return { page, limit, total, data }
+        return { tweets, total };
     }
 }
