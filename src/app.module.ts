@@ -12,6 +12,7 @@ import { TweetsModule } from './tweets/tweets.module';
 import { LikesModule } from './likes/likes.module';
 import { UserProfilesModule } from './user-profiles/user-profiles.module';
 import { FollowsModule } from './follows/follows.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { FollowsModule } from './follows/follows.module';
     LikesModule,
     UserProfilesModule,
     FollowsModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],
