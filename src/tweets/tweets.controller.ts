@@ -7,6 +7,7 @@ import { TweetResponseDto } from './dto/tweet-response.dto';
 import { tweetsMapper } from './util/tweets.mapper';
 import { TweetCreatedDto } from './dto/tweet-created.dto';
 import { tweetCreatedMapper } from './util/tweet-created.mapper';
+import { LikeResponse } from 'src/likes/util/like-response.interface';
 
 @Controller('tweets')
 export class TweetsController {
@@ -25,7 +26,7 @@ export class TweetsController {
 
     @UseGuards(AuthGuard)
     @Post(':id/like')
-    async toggleLikeTweet (@Param('id', ParseIntPipe) tweetId: number, @Request() request){
+    async toggleLikeTweet (@Param('id', ParseIntPipe) tweetId: number, @Request() request): Promise<LikeResponse> {
         const userId = request.user.sub;
         return await this.tweetsService.toggleLikeTweet(tweetId, userId);
     }

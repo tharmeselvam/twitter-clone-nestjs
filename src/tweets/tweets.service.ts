@@ -7,6 +7,7 @@ import { LikesService } from 'src/likes/likes.service';
 import { FollowsService } from 'src/follows/follows.service';
 import { PaginatedResult } from 'src/util/paginated-result.interface';
 import { TweetResponseDto } from './dto/tweet-response.dto';
+import { LikeResponse } from 'src/likes/util/like-response.interface';
 
 @Injectable()
 export class TweetsService {
@@ -27,7 +28,7 @@ export class TweetsService {
         return await this.tweetsRepository.save(tweet);
     }
 
-    async toggleLikeTweet (tweetId: number, userId: number){
+    async toggleLikeTweet (tweetId: number, userId: number): Promise<LikeResponse> {
         return await this.likesService.toggleLikeTweet(tweetId, userId);
     }
 
