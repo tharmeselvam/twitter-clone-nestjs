@@ -17,7 +17,7 @@ export class TweetsService {
         private tweetsRepository: Repository<Tweet>
     ){}
 
-    async createTweet (payload: CreateTweetDto, userId: number, parentTweetId?: number){
+    async createTweet(payload: CreateTweetDto, userId: number, parentTweetId?: number): Promise<Tweet> {
         const tweet =  await this.tweetsRepository.create({
             content: payload.content,
             parentTweet: parentTweetId ? { id: parentTweetId } : undefined,

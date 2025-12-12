@@ -5,6 +5,8 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { PaginatedResult } from 'src/util/paginated-result.interface';
 import { TweetResponseDto } from './dto/tweet-response.dto';
 import { tweetsMapper } from './util/tweets.mapper';
+import { TweetCreatedDto } from './dto/tweet-created.dto';
+import { tweetCreatedMapper } from './util/tweet-created.mapper';
 
 @Controller('tweets')
 export class TweetsController {
@@ -14,9 +16,11 @@ export class TweetsController {
 
     @UseGuards(AuthGuard)
     @Post('create')
-    async createTweet (@Body() payload: CreateTweetDto, @Request() request){
+    async createTweet(@Body() payload: CreateTweetDto, @Request() request): Promise<TweetCreatedDto>{
         const userId = request.user.sub;
-        return await this.tweetsService.createTweet(payload, userId);
+        const tweet = await this.tweetsService.createTweet(payload, userId);
+
+        return tweetCreatedMapper(tweet);
     }
 
     @UseGuards(AuthGuard)
