@@ -13,7 +13,7 @@ export class SearchService {
         return await this.usersService.searchUsers(search, page);
     }
 
-    async searchTweets(search: string, page: number) {
-        return await this.tweetsService.searchTweets(search, page);
+    async searchTweets(key: string, page: number, limit: number): Promise<{ tweets, total }> {
+        return await this.tweetsService.searchTweets(key, page, limit);
     }
 }

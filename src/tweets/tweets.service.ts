@@ -5,6 +5,9 @@ import { In, Repository } from 'typeorm';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { LikesService } from 'src/likes/likes.service';
 import { FollowsService } from 'src/follows/follows.service';
+import { PaginatedResult } from 'src/util/paginated-result.interface';
+import { TweetResponseDto } from './dto/tweet-response.dto';
+import { LikeResponse } from 'src/likes/util/like-response.interface';
 
 @Injectable()
 export class TweetsService {
@@ -15,7 +18,7 @@ export class TweetsService {
         private tweetsRepository: Repository<Tweet>
     ){}
 
-    async createTweet (payload: CreateTweetDto, userId: number, parentTweetId?: number){
+    async createTweet(payload: CreateTweetDto, userId: number, parentTweetId?: number): Promise<Tweet> {
         const tweet =  await this.tweetsRepository.create({
             content: payload.content,
             parentTweet: parentTweetId ? { id: parentTweetId } : undefined,
@@ -25,37 +28,61 @@ export class TweetsService {
         return await this.tweetsRepository.save(tweet);
     }
 
-    async toggleLikeTweet (tweetId: number, userId: number){
-        this.likesService.toggleLikeTweet(tweetId, userId);
+    async toggleLikeTweet (tweetId: number, userId: number): Promise<LikeResponse> {
+        return await this.likesService.toggleLikeTweet(tweetId, userId);
     }
 
-    async getTweetReplies (tweetId: number): Promise<Tweet[]> {
-        return await this.tweetsRepository.find({
-            where: { parentTweet: { id: tweetId }},
-            order: { createdAt: 'DESC' }
-        });
+    async getTweetReplies (tweetId: number, page: number, limit: number): Promise<{ tweets, total }> {
+        const [tweets, total] = await this.tweetsRepository
+            .createQueryBuilder('t')
+            .leftJoinAndSelect('t.user', 'u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .select(['t', 'u.id', 'u.username', 'p.name'])
+            .where('t.parentTweet.id = :id', {id: tweetId})
+            .orderBy('t.createdAt', 'ASC')
+            .take(limit)
+            .skip((page - 1) * limit)
+            .getManyAndCount();
+
+        return { tweets, total };
     }
 
-    async getFollowingTweets (userId: number): Promise<Tweet[]> {
+    async getFollowingTweets (userId: number, page: number, limit: number): Promise<{ tweets: Tweet[], total: number }> {
         const followedUserIds = await this.followsService.getFollowedUserIds(userId);
 
-        return this.tweetsRepository.find({
-            where: { user: { id: In(followedUserIds) } },
-            order: { createdAt: 'DESC' }
-        });
+        const [tweets, total] = await this.tweetsRepository
+            .createQueryBuilder('t')
+            .leftJoinAndSelect('t.user', 'u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .select(['t', 'u.id', 'u.username', 'p.name'])
+            .where('u.id IN (:...ids)', {ids: followedUserIds})
+            .orderBy('t.createdAt', 'DESC')
+            .take(limit)
+            .skip((page - 1) * limit)
+            .getManyAndCount();
+
+        return { tweets, total };
     }
 
-    async findTweetsByUserId (userId: number): Promise<Tweet[]> {
-        return await this.tweetsRepository.find({
-            where: { user: { id: userId }},
-            order: { createdAt: 'DESC' }
-        });
+    async findTweetsByUserId(userId: number, page: number, limit: number): Promise<{ tweets: Tweet[], total: number}> {
+        const [tweets, total] = await this.tweetsRepository
+            .createQueryBuilder('t')
+            .leftJoinAndSelect('t.user', 'u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .select(['t', 'u.id', 'u.username', 'p.name'])
+            .where('u.id = :id', {id: userId})
+            .orderBy('t.createdAt', 'DESC')
+            .take(limit)
+            .skip((page - 1) * limit)
+            .getManyAndCount();
+
+        return { tweets, total };
     }
 
-    async searchTweets(search: string, page: number, limit = 20) {
-        const query = `%${search}%`;
+    async searchTweets(key: string, page: number, limit: number): Promise<{ tweets, total }> {
+        const query = `%${key}%`;
 
-        const [data, total] = await this.tweetsRepository
+        const [tweets, total] = await this.tweetsRepository
             .createQueryBuilder('t')
             .leftJoinAndSelect('t.user', 'u')
             .leftJoinAndSelect('u.profile', 'p')
@@ -65,6 +92,6 @@ export class TweetsService {
             .skip((page - 1)*limit)
             .getManyAndCount();
 
-        return { page, limit, total, data }
+        return { tweets, total };
     }
 }
