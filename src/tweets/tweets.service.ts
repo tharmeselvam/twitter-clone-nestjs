@@ -57,6 +57,9 @@ export class TweetsService {
 
         const [data, total] = await this.tweetsRepository
             .createQueryBuilder('t')
+            .leftJoinAndSelect('t.user', 'u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .select(['t', 'u.id', 'u.username', 'p.name'])
             .where('LOWER(t.content) LIKE LOWER(:query)', {query})
             .take(limit)
             .skip((page - 1)*limit)
