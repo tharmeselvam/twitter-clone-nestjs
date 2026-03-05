@@ -1,4 +1,19 @@
 services:
+  app:
+    build: .
+    container_name: twitter-clone-nestjs-app
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+
   postgres:
     image: postgres:15
     container_name: twitter-clone-nestjs-db
