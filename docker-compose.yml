@@ -1,14 +1,14 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: twitter-clone-nestjs-mysql
+  postgres:
+    image: postgres:15
+    container_name: twitter-clone-nestjs-db
     restart: always
     ports:
-      - '3306:3306'
+      - '5432:5432'
     env_file:
       - docker.env
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7
