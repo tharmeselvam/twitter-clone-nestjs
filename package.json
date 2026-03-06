@@ -21,7 +21,8 @@
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli",
     "migration:generate": "yarn typeorm migration:generate -d ./data-source.ts",
     "migration:run": "yarn typeorm migration:run -d ./data-source.ts",
-    "migration:revert": "yarn typeorm migration:revert -d ./data-source.ts"
+    "migration:revert": "yarn typeorm migration:revert -d ./data-source.ts",
+    "docker:migrate": "docker compose exec app yarn migration:run"
   },
   "dependencies": {
     "@nestjs-modules/ioredis": "^2.0.2",
