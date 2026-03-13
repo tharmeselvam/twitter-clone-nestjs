@@ -33,11 +33,11 @@ export class UsersService {
         return await this.followsService.toggleFollow(followerUserId, followingUserId);
     }
 
-    async searchUsers(search: string, page: number, limit = 20) {
-        const query = `%${search}%`;
+    async searchUsers(key: string, page: number, limit = 20): Promise<{ users, total }> {
+        const query = `%${key}%`;
 
-        const [data, total] = await this.usersRepository
-            .createQueryBuilder('u')
+        const [users, total] = await this.usersRepository
+            .createQueryBuilder('u') 
             .leftJoinAndSelect('u.profile', 'p')
             .select(['u.id', 'u.username', 'p.name', 'p.bio'])
             .where('LOWER(u.username) LIKE LOWER(:query)', {query})
@@ -45,6 +45,6 @@ export class UsersService {
             .skip((page - 1)*limit)
             .getManyAndCount();
 
-        return { page, limit, total, data };
+        return { users, total };
     }
 }

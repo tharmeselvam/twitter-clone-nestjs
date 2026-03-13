@@ -4,6 +4,8 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { tweetsMapper } from 'src/tweets/util/tweets.mapper';
 import { PaginatedResult } from 'src/util/paginated-result.interface';
 import { TweetResponseDto } from 'src/tweets/dto/tweet-response.dto';
+import { UserResponseDto } from 'src/users/dto/user-response.dto';
+import { usersMapper } from 'src/users/util/users.mapper';
 
 @Controller('search')
 export class SearchController {
@@ -14,10 +16,14 @@ export class SearchController {
     @UseGuards(AuthGuard)
     @Get('users')
     async searchUsers(
-        @Query('search') search: string,
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number
-    ) {
-        return await this.searchService.searchUsers(search, page);
+        @Query('key') key: string,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
+    ): Promise<PaginatedResult<UserResponseDto>> {
+        const { users, total } = await this.searchService.searchUsers(key, page, limit);
+        const data = users.map(usersMapper);
+
+        return { page, limit, total, data };
     }
 
     @UseGuards(AuthGuard)
