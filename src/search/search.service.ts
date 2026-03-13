@@ -9,8 +9,8 @@ export class SearchService {
         private tweetsService: TweetsService
     ){}
 
-    async searchUsers(search: string, page: number) {
-        return await this.usersService.searchUsers(search, page);
+    async searchUsers(key: string, page: number, limit: number) {
+        return await this.usersService.searchUsers(key, page, limit);
     }
 
     async searchTweets(key: string, page: number, limit: number): Promise<{ tweets, total }> {
