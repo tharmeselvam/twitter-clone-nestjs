@@ -29,6 +29,18 @@ export class UsersService {
         return savedUser;
     }
 
+    async getProfileByUserId(userId: number): Promise<User & { followerCount: number; followingCount: number }> {
+        const user = await this.usersRepository
+            .createQueryBuilder('u')
+            .leftJoinAndSelect('u.profile', 'p')
+            .loadRelationCountAndMap('u.followerCount', 'u.followers')
+            .loadRelationCountAndMap('u.followingCount', 'u.following')
+            .where('u.id = :id', {id: userId})
+            .getOne();
+        
+        return user as User & { followerCount: number; followingCount: number };
+    }
+
     async toggleFollow(followerUserId: number, followingUserId: number){
         return await this.followsService.toggleFollow(followerUserId, followingUserId);
     }
