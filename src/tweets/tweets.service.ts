@@ -79,6 +79,22 @@ export class TweetsService {
         return { tweets, total };
     }
 
+    async getLikedTweets(userId: number, page: number, limit: number): Promise<{ tweets: Tweet[], total: number }> {
+        const [ tweets, total ] = await this.tweetsRepository
+            .createQueryBuilder('t')
+            .innerJoin('t.likes', 'l', 'l.userId = :userId', {userId})
+            .innerJoinAndSelect('t.user', 'u')
+            .innerJoinAndSelect('u.profile', 'p')
+            .select(['t', 'u.id', 'u.username', 'p.name'])
+            .addSelect('l.createdAt')
+            .orderBy('l.createdAt', 'DESC')
+            .take(limit)
+            .skip((page - 1) * limit)
+            .getManyAndCount();
+
+        return { tweets, total };
+    }
+
     async searchTweets(key: string, page: number, limit: number): Promise<{ tweets, total }> {
         const query = `%${key}%`;
 

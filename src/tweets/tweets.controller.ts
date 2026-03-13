@@ -90,4 +90,17 @@ export class TweetsController {
 
         return { page, limit, total, data };
     }
+
+    @UseGuards(AuthGuard)
+    @Get('liked')
+    async getLikedTweets(
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+        @Request() request
+    ): Promise<PaginatedResult<TweetResponseDto>>{
+        const { tweets, total } = await this.tweetsService.getLikedTweets(request.user.sub, page, limit);
+        const data = tweets.map(tweetsMapper);
+
+        return { page, limit, total, data };
+    }
 }
