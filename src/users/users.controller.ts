@@ -29,4 +29,12 @@ export class UsersController {
 
         return userResponse;
     }
+
+    @Get(':id')
+    async getUserProfile (@Param('id', ParseIntPipe) userId): Promise<UserFullResponseDto> {
+        const user = await this.usersService.getProfileByUserId(userId);
+        const userResponse = userFullMapper(user);
+
+        return userResponse;
+    }
 }
