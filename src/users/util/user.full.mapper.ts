@@ -10,6 +10,8 @@ export function userFullMapper (
         profile: {
             name: user.profile.name,
             bio: user.profile.bio,
+            profileImageUri: user.profile.profileImageUri,
+            headerImageUri: user.profile.headerImageUri,
         },
         followerCount: user.followerCount,
         followingCount: user.followingCount,

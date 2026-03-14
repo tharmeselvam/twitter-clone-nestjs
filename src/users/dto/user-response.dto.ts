@@ -1,4 +1,4 @@
-import { UserProfileResponseDto, UserProfileWithBioResponseDto } from "src/user-profiles/dto/user-profile-response.dto";
+import { UserProfileFullResponseDto, UserProfileResponseDto, UserProfileWithBioResponseDto } from "src/user-profiles/dto/user-profile-response.dto";
 
 export class UserResponseDto {
     id: number;
@@ -15,7 +15,7 @@ export class TweetResponseUserDto {
 export class UserFullResponseDto {
     id: number;
     username;
-    profile: UserProfileWithBioResponseDto;
+    profile: UserProfileFullResponseDto;
     followerCount: number;
     followingCount: number;
 }
