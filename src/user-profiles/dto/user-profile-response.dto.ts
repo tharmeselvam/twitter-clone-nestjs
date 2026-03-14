@@ -3,5 +3,10 @@ export class UserProfileResponseDto {
 }
 
 export class UserProfileWithBioResponseDto extends UserProfileResponseDto {
-    bio: string;
+    bio: string  | null;
+}
+
+export class UserProfileFullResponseDto extends UserProfileWithBioResponseDto {
+    profileImageUri: string | null;
+    headerImageUri: string | null;
 }

@@ -15,4 +15,10 @@ export class UserProfile {
 
     @Column({ length: 150, nullable: true })
     bio: string;
+
+    @Column({nullable: true})
+    profileImageUri: string;
+
+    @Column({nullable: true})
+    headerImageUri: string;
 }
