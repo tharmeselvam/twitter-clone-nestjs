@@ -1,5 +1,6 @@
 export class UserProfileResponseDto {
     name: string;
+    profileImageUri: string | null;
 }
 
 export class UserProfileWithBioResponseDto extends UserProfileResponseDto {
@@ -7,6 +8,5 @@ export class UserProfileWithBioResponseDto extends UserProfileResponseDto {
 }
 
 export class UserProfileFullResponseDto extends UserProfileWithBioResponseDto {
-    profileImageUri: string | null;
     headerImageUri: string | null;
 }

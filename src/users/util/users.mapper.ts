@@ -8,6 +8,7 @@ export function usersMapper(user: User): UserResponseDto{
         profile: {
             name: user.profile.name,
             bio: user.profile.bio,
+            profileImageUri: user.profile.profileImageUri
         }
     }
 }
