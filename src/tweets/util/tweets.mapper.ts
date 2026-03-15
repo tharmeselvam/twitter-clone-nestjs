@@ -8,7 +8,8 @@ export function tweetsMapper(tweet: Tweet): TweetResponseDto {
             id: tweet.user.id,
             username: tweet.user.username,
             profile: {
-                name: tweet.user.profile.name
+                name: tweet.user.profile.name,
+                profileImageUri: tweet.user.profile.profileImageUri,
             }
         },
         content: tweet.content,
