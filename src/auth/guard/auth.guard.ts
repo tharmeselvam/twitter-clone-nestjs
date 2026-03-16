@@ -18,3 +18,10 @@ export class RefreshAuthGuard extends BaseAuthGuard {
         super(jwtService, 'auth');
     }
 }
+
+@Injectable()
+export class OptionalAuthGuard extends BaseAuthGuard {
+    constructor (jwtService: JwtService){
+        super(jwtService, 'api', true);
+    }
+}
