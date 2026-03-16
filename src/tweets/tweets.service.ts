@@ -155,36 +155,26 @@ export class TweetsService {
     }
 
     async searchTweets(
-        userId: number | undefined, key: string, page: number, limit: number
+        userId: number, key: string, page: number, limit: number
     ): Promise<{ tweets: TweetWithMetaDto[], total }> {
         const searchKey = `%${key}%`;
 
-        const query = this.tweetsRepository
+        const [tweets, total] = await this.tweetsRepository
             .createQueryBuilder('t')
             .leftJoinAndSelect('t.user', 'u')
             .leftJoinAndSelect('u.profile', 'p')
             .loadRelationCountAndMap('t.replyCount', 't.replies')
-            .loadRelationCountAndMap('t.likeCount', 't.likes');
-
-        if (userId) {
-            query
-                .leftJoinAndSelect(
-                    't.likes',
-                    'userLike',
-                    'userLike.user.id = :userId', { userId }
-                );
-        }
-
-        const selectFields = ['t', 'u.id', 'u.username', 'p.name', 'p.profileImageUri']
-        if (userId) selectFields.push('userLike')
-            
-        query
-            .select(selectFields)
+            .loadRelationCountAndMap('t.likeCount', 't.likes')
+            .leftJoinAndSelect(
+                't.likes',
+                'userLike',
+                'userLike.user.id = :userId', { userId }
+            )
+            .select(['t', 'u.id', 'u.username', 'p.name', 'p.profileImageUri', 'userLike'])
             .where('LOWER(t.content) LIKE LOWER(:query)', { query: searchKey })
             .take(limit)
             .skip((page - 1) * limit)
-
-        const [tweets, total] = await query.getManyAndCount();
+            .getManyAndCount();
 
         return { tweets: mapTweetsWithMeta(tweets), total };
     }

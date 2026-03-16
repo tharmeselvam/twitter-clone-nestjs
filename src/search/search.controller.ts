@@ -1,4 +1,4 @@
-import { Controller, DefaultValuePipe, Get, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, ParseIntPipe, Query, Request, UseGuards } from '@nestjs/common';
 import { SearchService } from './search.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { tweetsMapper } from 'src/tweets/util/tweets.mapper';
@@ -29,11 +29,12 @@ export class SearchController {
     @UseGuards(AuthGuard)
     @Get('tweets')
     async searchTweets(
+        @Request() request,
         @Query('key') key: string,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
     ): Promise<PaginatedResult<TweetResponseDto>> {
-        const { tweets, total } = await this.searchService.searchTweets(key, page, limit);
+        const { tweets, total } = await this.searchService.searchTweets(request.user.sub, key, page, limit);
         const data = tweets.map(tweetsMapper);
 
         return { page, limit, total, data };
