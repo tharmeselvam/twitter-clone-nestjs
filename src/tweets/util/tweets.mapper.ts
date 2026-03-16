@@ -1,7 +1,8 @@
-import { Tweet } from "src/entities/tweet.entity";
-import { TweetResponseDto } from "../dto/tweet-response.dto";
+import { TweetResponseDto, TweetWithMetaDto } from "../dto/tweet-response.dto";
 
-export function tweetsMapper(tweet: Tweet): TweetResponseDto {
+export function tweetsMapper(
+    tweet: TweetWithMetaDto
+): TweetResponseDto {
     return {
         id: tweet.id,
         user: {
@@ -12,6 +13,9 @@ export function tweetsMapper(tweet: Tweet): TweetResponseDto {
                 profileImageUri: tweet.user.profile.profileImageUri,
             }
         },
+        replyCount: tweet.replyCount,
+        likeCount: tweet.likeCount,
+        isLiked: tweet.isLiked,
         content: tweet.content,
         createdAt: tweet.createdAt
     };
