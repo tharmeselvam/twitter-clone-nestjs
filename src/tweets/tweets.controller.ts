@@ -70,10 +70,24 @@ export class TweetsController {
     @Get('me')
     async getMyTweets(
         @Request() request,
+        @Query('replies', new DefaultValuePipe(true)) replies: boolean,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
     ): Promise<PaginatedResult<TweetResponseDto>> {
-        const { tweets, total } = await this.tweetsService.findTweetsByUserId(request.user.sub, page, limit);
+        const { tweets, total } = await this.tweetsService.findTweetsByUserId(request.user.sub, replies, page, limit);
+        const data = tweets.map(tweetsMapper);
+
+        return { page, limit, total, data };
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('liked')
+    async getLikedTweets(
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+        @Request() request
+    ): Promise<PaginatedResult<TweetResponseDto>>{
+        const { tweets, total } = await this.tweetsService.getLikedTweets(request.user.sub, page, limit);
         const data = tweets.map(tweetsMapper);
 
         return { page, limit, total, data };
@@ -82,10 +96,11 @@ export class TweetsController {
     @Get('user/:id')
     async getUserTweets(
         @Param('id', ParseIntPipe) userId: number,
+        @Query('replies', new DefaultValuePipe(true)) replies: boolean,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
     ): Promise<PaginatedResult<TweetResponseDto>>{
-        const { tweets, total } = await this.tweetsService.findTweetsByUserId(userId, page, limit);
+        const { tweets, total } = await this.tweetsService.findTweetsByUserId(userId, replies, page, limit);
         const data = tweets.map(tweetsMapper);
 
         return { page, limit, total, data };

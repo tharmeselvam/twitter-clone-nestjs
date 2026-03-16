@@ -64,14 +64,38 @@ export class TweetsService {
         return { tweets, total };
     }
 
-    async findTweetsByUserId(userId: number, page: number, limit: number): Promise<{ tweets: Tweet[], total: number}> {
-        const [tweets, total] = await this.tweetsRepository
+    async findTweetsByUserId(userId: number, replies, page: number, limit: number): Promise<{ tweets: Tweet[], total: number}> {
+        const query = this.tweetsRepository
             .createQueryBuilder('t')
             .leftJoinAndSelect('t.user', 'u')
             .leftJoinAndSelect('u.profile', 'p')
             .select(['t', 'u.id', 'u.username', 'p.name'])
-            .where('u.id = :id', {id: userId})
+            .where('u.id = :id', {id: userId});
+
+        // Omit replies
+        if (!replies) {
+            query.andWhere('t.parentTweetId IS NULL');
+        }
+
+        query
             .orderBy('t.createdAt', 'DESC')
+            .take(limit)
+            .skip((page - 1) * limit);
+            
+        const [tweets, total] = await query.getManyAndCount();
+
+        return { tweets, total };
+    }
+
+    async getLikedTweets(userId: number, page: number, limit: number): Promise<{ tweets: Tweet[], total: number }> {
+        const [ tweets, total ] = await this.tweetsRepository
+            .createQueryBuilder('t')
+            .innerJoin('t.likes', 'l', 'l.userId = :userId', {userId})
+            .innerJoinAndSelect('t.user', 'u')
+            .innerJoinAndSelect('u.profile', 'p')
+            .select(['t', 'u.id', 'u.username', 'p.name'])
+            .addSelect('l.createdAt')
+            .orderBy('l.createdAt', 'DESC')
             .take(limit)
             .skip((page - 1) * limit)
             .getManyAndCount();
