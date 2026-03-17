@@ -82,6 +82,7 @@ export class TweetsService {
             )
             .select(['t', 'u.id', 'u.username', 'p.name', 'p.profileImageUri', 'userLike'])
             .where('u.id IN (:...ids)', { ids: followedUserIds })
+            .andWhere('t.parentTweetId IS NULL')
             .orderBy('t.createdAt', 'DESC')
             .take(limit)
             .skip((page - 1) * limit)
@@ -105,7 +106,7 @@ export class TweetsService {
                 .leftJoinAndSelect(
                     't.likes',
                     'userLike',
-                    'userLike.user.id = :userId', { currentUserId }
+                    'userLike.user.id = :currentUserId', { currentUserId }
                 )
         }
 
@@ -172,6 +173,7 @@ export class TweetsService {
             )
             .select(['t', 'u.id', 'u.username', 'p.name', 'p.profileImageUri', 'userLike'])
             .where('LOWER(t.content) LIKE LOWER(:query)', { query: searchKey })
+            .orderBy('t.createdAt', 'DESC')
             .take(limit)
             .skip((page - 1) * limit)
             .getManyAndCount();
