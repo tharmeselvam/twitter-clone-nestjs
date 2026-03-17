@@ -46,13 +46,14 @@ export class UsersService {
     }
 
     async searchUsers(key: string, page: number, limit = 20): Promise<{ users, total }> {
-        const query = `%${key}%`;
+        const searchKey = `%${key}%`;
 
         const [users, total] = await this.usersRepository
             .createQueryBuilder('u') 
             .leftJoinAndSelect('u.profile', 'p')
             .select(['u.id', 'u.username', 'p.name', 'p.bio', 'p.profileImageUri'])
-            .where('LOWER(u.username) LIKE LOWER(:query)', {query})
+            .where('LOWER(u.username) LIKE LOWER(:query)', {query: searchKey})
+            .orWhere('LOWER(p.name) LIKE LOWER(:query)', {query: searchKey})
             .take(limit)
             .skip((page - 1)*limit)
             .getManyAndCount();

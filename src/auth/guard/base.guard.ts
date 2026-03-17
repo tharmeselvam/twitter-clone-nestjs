@@ -7,7 +7,8 @@ dotenv.config()
 export class BaseAuthGuard implements CanActivate {
     constructor (
         private jwtService: JwtService,
-        private expectedAud: string
+        private expectedAud: string,
+        private optional: boolean = false
     ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -15,6 +16,7 @@ export class BaseAuthGuard implements CanActivate {
         const token = this.extractTokenFromHeader(request);
 
         if (!token){
+            if (this.optional) return true;
             throw new UnauthorizedException;
         }
 

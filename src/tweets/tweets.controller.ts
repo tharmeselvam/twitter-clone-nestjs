@@ -1,7 +1,7 @@
-import { Request, Body, Controller, Post, Get, UseGuards, Param, ParseIntPipe, Query, DefaultValuePipe } from '@nestjs/common';
+import { Request, Body, Controller, Post, Get, UseGuards, Param, ParseIntPipe, Query, DefaultValuePipe, Req } from '@nestjs/common';
 import { TweetsService } from './tweets.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard, OptionalAuthGuard } from 'src/auth/guard/auth.guard';
 import { PaginatedResult } from 'src/util/paginated-result.interface';
 import { TweetResponseDto } from './dto/tweet-response.dto';
 import { tweetsMapper } from './util/tweets.mapper';
@@ -41,13 +41,15 @@ export class TweetsController {
             return await this.tweetsService.createTweet(payload, userId, parentTweetId);
     }
 
+    @UseGuards(OptionalAuthGuard)
     @Get(':id/replies')
     async getTweetReplies(
+        @Request() request,
         @Param('id', ParseIntPipe) tweetId: number,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
     ): Promise<PaginatedResult<TweetResponseDto>>{
-        const { tweets, total } = await this.tweetsService.getTweetReplies(tweetId, page, limit);
+        const { tweets, total } = await this.tweetsService.getTweetReplies(request.user?.sub, tweetId, page, limit);
         const data = tweets.map(tweetsMapper);
 
         return { page, limit, total, data };
@@ -74,7 +76,8 @@ export class TweetsController {
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
     ): Promise<PaginatedResult<TweetResponseDto>> {
-        const { tweets, total } = await this.tweetsService.findTweetsByUserId(request.user.sub, replies, page, limit);
+        const userId = request.user.sub;
+        const { tweets, total } = await this.tweetsService.findTweetsByUserId(userId, userId, replies, page, limit);
         const data = tweets.map(tweetsMapper);
 
         return { page, limit, total, data };
@@ -93,14 +96,16 @@ export class TweetsController {
         return { page, limit, total, data };
     }
 
+    @UseGuards(OptionalAuthGuard)
     @Get('user/:id')
     async getUserTweets(
+        @Request() request,
         @Param('id', ParseIntPipe) userId: number,
         @Query('replies', new DefaultValuePipe(true)) replies: boolean,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
     ): Promise<PaginatedResult<TweetResponseDto>>{
-        const { tweets, total } = await this.tweetsService.findTweetsByUserId(userId, replies, page, limit);
+        const { tweets, total } = await this.tweetsService.findTweetsByUserId(request.user?.sub, userId, replies, page, limit);
         const data = tweets.map(tweetsMapper);
 
         return { page, limit, total, data };
